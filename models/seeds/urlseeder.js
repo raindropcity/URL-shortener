@@ -25,3 +25,5 @@ db.once('open', () => {
   })
   console.log('done.')
 })
+
+module.exports = getRandomCharacter(characterArray)
