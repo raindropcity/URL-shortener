@@ -1,8 +1,17 @@
 <h4>Success! Please use this link: </h4>
 <div>
-  <a href="{{originalURL}}" target="_blank" class="mt-3">{{transformedURL}}</a>
+  <a href="{{originalURL}}" target="_blank" class="mt-3" id="transformedURL">{{transformedURL}}</a>
 </div>
 <div>
-  <a href="#" class="btn btn-secondary mt-3">Copy</a>
+  <button type="button" class="btn btn-secondary mt-3" onclick="copy()">Copy</button>
   <a href="/" class="btn btn-primary mt-3 ml-2">Home</a>
 </div>
+
+<script>
+  function copy() {
+    const transformedURL = document.querySelector('#transformedURL')
+    navigator.clipboard.writeText(transformedURL.innerText)
+      .then(() => { alert('Copied !') })
+      .catch((error) => { console.log(error) })
+  }
+</script>

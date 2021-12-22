@@ -7,8 +7,7 @@ router.use(express.urlencoded({ extended: true }))
 router.post('/', (req, res) => {
   const getRandomCharacter = require('../../models/seeds/urlseeder')
 
-  URLdata.find({})
-    .select('originalURL')
+  URLdata.find({}, 'originalURL') //抓全部「且」field名為originalURL的資料出來
     .then((field) => {
       // the augument "field" is an array like this: 
       // [{
