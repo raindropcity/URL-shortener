@@ -1,4 +1,5 @@
 const express = require('express')
+const { sendStatus } = require('express/lib/response')
 const router = express.Router()
 const URLdata = require('../../models/urldata')
 
@@ -25,18 +26,17 @@ router.post('/', (req, res) => {
           randomCharacter: getRandomCharacter,
           transformedURL: `http://localhost:3000/urlshortener/${getRandomCharacter}`
         })
-          // Render the page "submit"
-          .then(() => {
-            URLdata.findOne({ originalURL: req.body.originalURL })
-              .lean()
-              .then((selectedDocument) => {
-                console.log(selectedDocument)
-                return res.render('submit', { transformedURL: selectedDocument.transformedURL, randomCharacter: selectedDocument.randomCharacter })
-              })
-          })
-          .catch((error) => { console.log(error) })
       }
     })
+    // Render the page "submit"
+    .then(() => {
+      URLdata.findOne({ originalURL: req.body.originalURL })
+        .lean()
+        .then((selectedDocument) => {
+          return res.render('submit', { transformedURL: selectedDocument.transformedURL, randomCharacter: selectedDocument.randomCharacter })
+        })
+    })
+    .catch((error) => { console.log(error) })
 })
 
 // 轉址
@@ -45,10 +45,10 @@ router.get('/:randomChar', (req, res) => {
   URLdata.findOne({ randomCharacter: randomChar })
     .then((data) => {
       if (data) {
-        return res.redirect(data.originalURL)
+        return res.status(301).redirect(data.originalURL)
       }
     })
-    .catch((error) => { console.log(error) })
+    .catch(() => { res.sendStatus(404) })
 })
 
 module.exports = router
