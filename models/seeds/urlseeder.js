@@ -20,8 +20,8 @@ db.once('open', () => {
   
   URLdata.create({
     originalURL: 'https://www.google.com',
-    radomCharacter: generateCharacter,
-    transformedURL: `http://urlshortener/${generateCharacter}`
+    randomCharacter: generateCharacter,
+    transformedURL: `http://localhost:3000/urlshortener/${generateCharacter}`
   })
   console.log('done.')
 })

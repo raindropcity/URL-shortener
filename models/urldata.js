@@ -6,7 +6,7 @@ const urlSchema = new Schema({
     type: String,
     require: true
   },
-  radomCharacter: {
+  randomCharacter: {
     type: String,
     require: true
   },
