@@ -1,5 +1,6 @@
 const express = require('express')
 const { sendStatus } = require('express/lib/response')
+const { find } = require('../../models/urldata')
 const router = express.Router()
 const URLdata = require('../../models/urldata')
 
@@ -8,35 +9,31 @@ router.use(express.urlencoded({ extended: true }))
 router.post('/', (req, res) => {
   const getRandomCharacter = require('../../models/seeds/urlseeder')
 
-  URLdata.find({}, 'originalURL') //抓全部「且」field名為originalURL的資料出來
-    // add new URL info into Mongodb
-    .then((field) => {
-      // the augument "field" is an array like this: 
-      // [{
-      //    _id: new ObjectId("61beb08c76b774c53405d90a"),
-      //    originalURL: 'https://www.google.com'
-      // }]
-      const dataArray = []
-
-      field.forEach((object) => { return dataArray.push(object.originalURL) })
-
-      if (!dataArray.some((element) => { return element === req.body.originalURL })) {
-        return URLdata.create({
-          originalURL: req.body.originalURL,
-          randomCharacter: getRandomCharacter,
-          transformedURL: `http://localhost:3000/urlshortener/${getRandomCharacter}`
-        })
+  URLdata.find({})
+    .lean()
+    .then(async (dbArray) => {
+      // if Mongodb had had the inputed originalURL data, render it on "submit" page.
+      const foundData = await dbArray.find((eachElement) => { return eachElement.originalURL === req.body.originalURL })
+      if (foundData) {
+        return res.render('submit', { transformedURL: foundData.transformedURL, randomCharacter: foundData.randomCharacter })
       }
+      // if Mongodb did not invole the inputed originalURL data, check the randomCharacter to keep it from repeat, then create the new data.
+      let randomChar = getRandomCharacter
+      while (dbArray.some((eachElement) => { return eachElement.randomCharacter === randomChar })) {
+        randomChar = getRandomCharacter
+      }
+      const newData = await URLdata.create({
+        originalURL: req.body.originalURL,
+        randomCharacter: randomChar,
+        transformedURL: `http://localhost:3000/urlshortener/${randomChar}`
+      })
+      return res.render('submit', { transformedURL: newData.transformedURL, randomCharacter: newData.randomCharacter })
     })
-    // Render the page "submit"
-    .then(() => {
-      URLdata.findOne({ originalURL: req.body.originalURL })
-        .lean()
-        .then((selectedDocument) => {
-          return res.render('submit', { transformedURL: selectedDocument.transformedURL, randomCharacter: selectedDocument.randomCharacter })
-        })
-    })
-    .catch((error) => { console.log(error) })
+    // .then(async (newData) => {
+    //   console.log(newData)
+    //   return res.render('submit', { transformedURL: await newData.transformedURL, randomCharacter: await newData.randomCharacter })
+    // })
+    .catch(() => { res.sendStatus(404) })
 })
 
 // 轉址
