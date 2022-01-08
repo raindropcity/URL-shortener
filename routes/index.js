@@ -4,7 +4,7 @@ const home = require('./modules/home')
 const CRUD = require('./modules/CRUD')
 
 router.use('/', home)
-router.use('/urlshortener', CRUD)
+router.use('/', CRUD)
 
 
 module.exports = router

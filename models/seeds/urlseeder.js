@@ -6,7 +6,7 @@ const number = '0123456789'
 const characterArray = alphabet.split('').concat(lowerCaseAlphabet.split('').concat(number.split('')))
 
 
-function getRandomCharacter(array) {
+const generateCharacter = function (array) {
   let literal = ''
   for (let i = 0; i < 5; i++) {
     const index = Math.floor(Math.random() * array.length)
@@ -16,14 +16,17 @@ function getRandomCharacter(array) {
 }
 
 db.once('open', () => {
-  const generateCharacter = getRandomCharacter(characterArray)
+  // const generateCharacter = getRandomCharacter(characterArray)
   
   URLdata.create({
     originalURL: 'https://www.google.com',
-    randomCharacter: generateCharacter,
-    transformedURL: `http://localhost:3000/urlshortener/${generateCharacter}`
+    randomCharacter: generateCharacter(characterArray),
+    transformedURL: `http://localhost:3000/${generateCharacter(characterArray)}`
   })
   console.log('done.')
 })
 
-module.exports = getRandomCharacter(characterArray)
+module.exports = {
+  characterArray: characterArray,
+  generateCharacter: generateCharacter
+}
